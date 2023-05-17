@@ -1,102 +1,123 @@
 
-const itemList = document.getElementById("itemList");
-const itemName = document.getElementById("itemName");
-const itemDescription = document.getElementById("itemDescription");
-const itemPrice = document.getElementById("itemPrice");
-const itemQuantity = document.getElementById("itemQuantity");
+const itemList = document.getElementById('itemList');
+const itemForm = document.getElementById('itemForm');
 
-let items = [];
+let items = [] ;
 
 function addItem(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  const item = {
-    name: itemName.value,
-    description: itemDescription.value,
-    price: itemPrice.value,
-    quantity: itemQuantity.value,
-  };
+   const itemName = document.getElementById('itemName').value;
+   const itemDescription = document.getElementById('itemDescription').value;
+    const itemPrice = document.getElementById('itemPrice').value;
+    const itemQuantity = document.getElementById('itemQuantity').value;
 
-  
-  axios
-    .post(
-      "https://crudcrud.com/api/69761a7d5026476bae08d4d7178a8055/storeData",
-      item
-    )
+
+    const item = {
+
+        name: itemName,
+        description: itemDescription,
+        price: itemPrice,
+        quantity: itemQuantity
+    };
+
+    axios.post("https://crudcrud.com/api/c22c17587d604c87982abe322adbddbc/storeData" , item)
     .then(() => {
-      
-      itemName.value = "";
-      itemDescription.value = "";
-      itemPrice.value = "";
-      itemQuantity.value = "";
-
-      // Refresh item list after adding new item
-      displayItems();
+        itemForm.reset();
+        displayItems();
     })
     .catch((err) => {
-      console.log(err);
+        console.log(err)
     });
 }
 
 function displayItems() {
- 
-  axios
-    .get(
-      "https://crudcrud.com/api/69761a7d5026476bae08d4d7178a8055/storeData"
-    )
+    axios.get("https://crudcrud.com/api/c22c17587d604c87982abe322adbddbc/storeData")
     .then((response) => {
-      const items = response.data;
+        items = response.data;
+        itemList.innerHTML ='';
 
-      itemList.innerHTML = "";
+        for(let i = 0; i < items.length; i++) {
+            const item = items[i];
 
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const li = document.createElement("li");
-        li.textContent = ` ${item.name}  ${item.description}  ${item.price} ${item.quantity}`;
+            const li = document.createElement('li');
+            li.textContent = ` ${item.name}  ${item.description}  ${item.price}  ${item.quantity}`;
 
-        itemList.appendChild(li);
-      }
+            const buy1Button = document.createElement('button');
+            buy1Button.textContent = 'Buy 1';
+            buy1Button.addEventListener('click' , () => {
+                updateItem(item._id, item.quantity - 1, item.name, item.description, item.price); 
+            });
 
-    
-      localStorage.setItem("items", JSON.stringify(items));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+            const buy2Button = document.createElement('button');
+            buy2Button.textContent = 'Buy 1';
+            buy2Button.addEventListener('click' , () => {
+                updateItem(item._id, item.quantity - 2, item.name, item.description, item.price); 
+            });
 
-function updateItem(itemId, itemQuantity) {
-  
-  axios
-    .put(
-      `https://crudcrud.com/api/69761a7d5026476bae08d4d7178a8055/storeData/${itemId}`,
-      { quantity: itemQuantity }
-    )
-    .then(() => {
-      // Update the item quantity in the items array
-      for (let i = 0; i < items.length; i++) {
-        if (items[i]._id === itemId) {
-          items[i].quantity = itemQuantity;
-          break;
+            const buy3Button = document.createElement('button');
+            buy3Button.textContent = 'Buy 1';
+            buy3Button.addEventListener('click' , () => {
+                updateItem(item._id, item.quantity - 3, item.name, item.description, item.price); 
+            });
+
+            li.appendChild(buy1Button);
+            li.appendChild(buy2Button);
+            li.appendChild(buy3Button);
+
+            itemList.appendChild(li);
         }
-      }
 
-    
-      displayItems();
     })
     .catch((err) => {
-      console.log(err);
+        console.log(err)
     });
 }
 
+function updateItem(itemId , newQuantity, name, description, price) {
 
-window.onload = function () {
-  const storedItems = JSON.parse(localStorage.getItem("items"));
-  if (storedItems) {
-    items = storedItems;
+    axios.put(`https://crudcrud.com/api/c22c17587d604c87982abe322adbddbc/storeData/${itemId}`, {
+        name: name,
+        description: description,
+        price: price,
+        quantity: newQuantity,
+    })
+    .then(() => {
+        displayItems();
+    })
+    .catch((err) => {
+        console.log(err)
+    });
+
+}
+
+window.onload = function() {
     displayItems();
-  } else {
-   
-    displayItems();
-  }
-};
+    itemForm.addEventListener('submit', addItem);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
